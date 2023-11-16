@@ -34,7 +34,7 @@ app.http("contentfulEventsHandler", {
             const requestBody = await request.json();
             context.log("Received Contentful Webhook data:", requestBody);
 
-            if (!requestBody.sys.space.sys.id || !requestBody.sys.createdAt || !requestBody.sys.environment.sys.id) {
+            if (!requestBody.sys.space.sys.id || !requestBody.sys.updatedAt || !requestBody.sys.environment.sys.id) {
                 context.error("Missing or undefined properties in the Contentful Webhook payload");
                 return {
                     status: 400,
@@ -43,7 +43,7 @@ app.http("contentfulEventsHandler", {
             }
 
             const contentfulSpaceId = requestBody.sys.space.sys.id;
-            const date = new Date(requestBody.sys.createdAt).toISOString().slice(0, -1);
+            const date = new Date(requestBody.sys.updatedAt).toISOString().slice(0, -1);
             const actions = request.headers.get('x-contentful-topic').split(".").pop();
             const userId = request.query.get('user');
             const environment = requestBody.sys.environment.sys.id;
