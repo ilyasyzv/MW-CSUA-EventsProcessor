@@ -53,12 +53,14 @@ app.http("contentfulEventsHandler", {
             const user = client.getOrganization(ContentfulOrganizationId)
                 .then((organization) => organization.getUser(userId))
 
+            context.log(user.email)
+
             try {
                 const bigQueryRow = {
                     contentfulSpace: space.name,
                     date: date,
                     actions: actions,
-                    user: user.email,
+                    user: userId,
                     environment: environment,
                 }
 
