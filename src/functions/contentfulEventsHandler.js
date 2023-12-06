@@ -43,6 +43,17 @@ app.http("contentfulEventsHandler", {
                 };
             }
 
+            async function getUserEmail() {
+                try {
+                    const organization = await client.getOrganization('5i0sA6kihMnpqixItAwL0c');
+                    const user = await organization.getUser('5ad7xIRg0po8sU2sSlMsPK');
+                    return user.email;
+                } catch (error) {
+                    console.error('Error:', error);
+                    throw error;
+                }
+            }
+
             const contentfulSpaceId = requestBody.sys.space.sys.id;
             const date = new Date(requestBody.sys.updatedAt).toISOString().slice(0, -1);
             const actions = request.headers.get('x-contentful-topic').split(".").pop();
@@ -50,12 +61,8 @@ app.http("contentfulEventsHandler", {
             const environment = requestBody.sys.environment.sys.id;
 
             const space = await client.getSpace(contentfulSpaceId);
-            // const user = client.getOrganization(ContentfulOrganizationId)
-            //     .then((organization) => organization.getUser(userId))
-            //     .then((user) => {
-            //         return user
-            //     })
-
+            const userEmail = await getUserEmail()
+            
             try {
                 const bigQueryRow = {
                     contentfulSpace: space.name,
@@ -70,11 +77,7 @@ app.http("contentfulEventsHandler", {
                     .table(BigQueryTableId)
                     .insert([bigQueryRow]);
 
-                client.getOrganization(ContentfulOrganizationId)
-                    .then((organization) => organization.getUser(userId))
-                    .then((user) => context.log(user))
-
-                context.log("Data saved to BigQuery.", bigQueryRow);
+                context.log("Data saved to BigQuery.", bigQueryRow, userEmail);
 
                 return {
                     status: 200,
