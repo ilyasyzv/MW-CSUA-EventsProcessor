@@ -52,6 +52,9 @@ app.http("contentfulEventsHandler", {
             const space = await client.getSpace(contentfulSpaceId);
             const user = client.getOrganization(ContentfulOrganizationId)
                 .then((organization) => organization.getUser(userId))
+                .then((user) => {
+                    return user
+                })
 
             context.log(user.email)
 
