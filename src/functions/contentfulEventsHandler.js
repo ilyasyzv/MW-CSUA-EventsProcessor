@@ -58,7 +58,7 @@ app.http("contentfulEventsHandler", {
                     contentfulSpace: space.name,
                     date: date,
                     actions: actions,
-                    user: user,
+                    user: user.email,
                     environment: environment,
                 }
 
