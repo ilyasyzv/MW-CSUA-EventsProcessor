@@ -9,7 +9,8 @@ const {
     ContentfulAccessTokenName,
     BigQueryTokenName,
     BigQueryDatasetId,
-    BigQueryTableId
+    BigQueryTableId,
+    ContentfulOrganizationId
 } = process.env;
 
 const secretClient = new SecretClient(`https://${AzureVaultName}.vault.azure.net`, new DefaultAzureCredential());
@@ -49,13 +50,15 @@ app.http("contentfulEventsHandler", {
             const environment = requestBody.sys.environment.sys.id;
 
             const space = await client.getSpace(contentfulSpaceId);
+            const user = client.getOrganization(ContentfulOrganizationId)
+                .then((organization) => organization.getUser(userId))
 
             try {
                 const bigQueryRow = {
                     contentfulSpace: space.name,
                     date: date,
                     actions: actions,
-                    user: userId,
+                    user: user,
                     environment: environment,
                 }
 
