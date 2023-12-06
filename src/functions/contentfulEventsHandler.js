@@ -56,8 +56,6 @@ app.http("contentfulEventsHandler", {
                     return user
                 })
 
-            context.log(user.email)
-
             try {
                 const bigQueryRow = {
                     contentfulSpace: space.name,
@@ -72,6 +70,7 @@ app.http("contentfulEventsHandler", {
                     .table(BigQueryTableId)
                     .insert([bigQueryRow]);
 
+                context.log(user.email)
                 context.log("Data saved to BigQuery.", bigQueryRow);
 
                 return {
