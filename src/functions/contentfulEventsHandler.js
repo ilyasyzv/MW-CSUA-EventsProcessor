@@ -50,11 +50,11 @@ app.http("contentfulEventsHandler", {
             const environment = requestBody.sys.environment.sys.id;
 
             const space = await client.getSpace(contentfulSpaceId);
-            const user = client.getOrganization(ContentfulOrganizationId)
-                .then((organization) => organization.getUser(userId))
-                .then((user) => {
-                    return user
-                })
+            // const user = client.getOrganization(ContentfulOrganizationId)
+            //     .then((organization) => organization.getUser(userId))
+            //     .then((user) => {
+            //         return user
+            //     })
 
             try {
                 const bigQueryRow = {
@@ -70,7 +70,10 @@ app.http("contentfulEventsHandler", {
                     .table(BigQueryTableId)
                     .insert([bigQueryRow]);
 
-                context.log(user.email)
+                client.getOrganization(ContentfulOrganizationId)
+                    .then((organization) => organization.getUser(userId))
+                    .then((user) => context.log(user))
+
                 context.log("Data saved to BigQuery.", bigQueryRow);
 
                 return {
