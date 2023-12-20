@@ -3,6 +3,7 @@ const { BigQuery } = require("@google-cloud/bigquery");
 const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
 const contentful = require('contentful-management');
+const { BlobStorageService } = require('../services/blogStorageService')
 
 const {
     AzureVaultName,
@@ -10,7 +11,10 @@ const {
     BigQueryTokenName,
     BigQueryDatasetId,
     BigQueryTableId,
-    ContentfulOrganizationId
+    ContentfulOrganizationId,
+    DebugMode = 1,
+    AzureStorageAccountName = 'eventshandlerstoragedev',
+    AzureStorageContainerName = 'contentful-webhooks-logs'
 } = process.env;
 
 const secretClient = new SecretClient(`https://${AzureVaultName}.vault.azure.net`, new DefaultAzureCredential());
@@ -34,6 +38,16 @@ app.http("contentfulEventsHandler", {
 
             const requestBody = await request.json();
             context.log("Received Contentful Webhook data:", requestBody);
+
+            if(DebugMode && +DebugMode === 1) {
+                const storageService = new BlobStorageService({accountName: AzureStorageAccountName, logger: context})
+                const blobName = `contentful-webhooks-${new Date().toISOString()}`
+                const data = JSON.stringify({body: requestBody, headers: request.headers, query: request.query})
+                const [isUploaded, requestId] = await storageService.upload(AzureStorageContainerName, blobName, data)
+                if(isUploaded) {
+                    context.log(`log created with request: ${requestId}`)
+                }
+            }
 
             if (!requestBody.sys.space.sys.id || !requestBody.sys.updatedAt || !requestBody.sys.environment.sys.id) {
                 context.error("Missing or undefined properties in the Contentful Webhook payload");
@@ -63,7 +77,7 @@ app.http("contentfulEventsHandler", {
             }
 
             const userEmail = await getUserEmail()
-            
+
             try {
                 const bigQueryRow = {
                     contentfulSpace: space.name,

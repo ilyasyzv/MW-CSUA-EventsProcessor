@@ -5,18 +5,17 @@
   "scripts": {
     "start": "func start",
     "test": "echo \"No tests yet...\"",
-    "build": "echo \"No build yet...\"" 
+    "build": "echo \"No build yet...\""
   },
   "dependencies": {
     "@azure/functions": "^4.0.0",
     "@azure/identity": "^3.3.2",
     "@azure/keyvault-secrets": "^4.7.0",
-    "@azure/storage-blob": "^12.16.0",
+    "@azure/storage-blob": "^12.17.0",
     "@google-cloud/bigquery": "^7.3.0",
     "axios": "^1.5.1",
     "azure-storage": "^2.10.7",
     "contentful-management": "^11.2.0"
   },
-  "devDependencies": {},
   "main": "src/functions/*.js"
 }
