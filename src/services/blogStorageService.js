@@ -1,6 +1,4 @@
-import { DefaultAzureCredential } from "@azure/identity";
-import { createTableServiceWithSas } from "azure-storage";
-
+const { DefaultAzureCredential } = require("@azure/identity");
 const { BlobServiceClient } = require("@azure/storage-blob");
 
 export class BlobStorageService {
