@@ -21,6 +21,14 @@ const {
 
 const secretClient = new SecretClient(`https://${AzureVaultName}.vault.azure.net`, new DefaultAzureCredential());
 
+function extractFromEntries(obj) {
+    const result = {}
+    for (const [key, value] of obj.entries()) {
+        result[key] = value
+    }
+    return result
+}
+
 app.http("contentfulEventsHandler", {
     methods: ["POST"],
     authLevel: "anonymous",
@@ -45,7 +53,9 @@ app.http("contentfulEventsHandler", {
                 const sharedKeyCredential = new StorageSharedKeyCredential(AzureStorageAccountName, AzureStorageAccountKey);
                 const storageService = new BlobStorageService({accountName: AzureStorageAccountName, logger: context, credential: sharedKeyCredential})
                 const blobName = `contentful-webhooks-${new Date().toISOString()}`
-                const data = JSON.stringify({body: requestBody, headers: request.headers, query: request.query})
+                const headerObj = extractFromEntries(request.headers)
+                const queryObj = extractFromEntries(request.query)
+                const data = JSON.stringify({body: requestBody, headers: headerObj, query: queryObj})
                 const [isUploaded, requestId] = await storageService.upload(AzureStorageContainerName, blobName, data)
                 if(isUploaded) {
                     context.log(`log created with request: ${requestId}`)
