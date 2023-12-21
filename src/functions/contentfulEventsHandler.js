@@ -3,7 +3,7 @@ const { BigQuery } = require("@google-cloud/bigquery");
 const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
 const contentful = require('contentful-management');
-const { BlobStorageService } = require('../services/blogStorageService')
+const BlobStorageService = require('../services/blogStorageService')
 
 const {
     AzureVaultName,

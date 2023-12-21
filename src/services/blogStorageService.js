@@ -1,7 +1,7 @@
 const { DefaultAzureCredential } = require("@azure/identity");
 const { BlobServiceClient } = require("@azure/storage-blob");
 
-export class BlobStorageService {
+class BlobStorageService {
   #client;
   #logger;
 
@@ -41,3 +41,5 @@ export class BlobStorageService {
     return this.#logger;
   }
 }
+
+module.exports = BlobStorageService;
