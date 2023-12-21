@@ -1,4 +1,3 @@
-const { DefaultAzureCredential } = require("@azure/identity");
 const { BlobServiceClient } = require("@azure/storage-blob");
 
 class BlobStorageService {
@@ -6,9 +5,9 @@ class BlobStorageService {
   #logger;
 
   constructor(options) {
-    const { accountName, logger } = this.validate(options);
+    const { accountName, logger, credential } = this.validate(options);
     const blobURL = `https://${accountName}.blob.core.windows.net`;
-    this.#client = new BlobServiceClient(blobURL, new DefaultAzureCredential());
+    this.#client = new BlobServiceClient(blobURL, credential);
     this.#logger = logger;
   }
 

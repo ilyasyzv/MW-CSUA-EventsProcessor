@@ -2,8 +2,9 @@ const { app } = require("@azure/functions");
 const { BigQuery } = require("@google-cloud/bigquery");
 const { SecretClient } = require("@azure/keyvault-secrets");
 const { DefaultAzureCredential } = require("@azure/identity");
+const { StorageSharedKeyCredential } = require('@azure/storage-blob')
 const contentful = require('contentful-management');
-const BlobStorageService = require('../services/blogStorageService')
+const BlobStorageService = require('../services/blobStorageService')
 
 const {
     AzureVaultName,
@@ -14,7 +15,8 @@ const {
     ContentfulOrganizationId,
     DebugMode = 1,
     AzureStorageAccountName = 'eventshandlerstoragedev',
-    AzureStorageContainerName = 'contentful-webhooks-logs'
+    AzureStorageContainerName = 'contentful-webhooks-logs',
+    AzureStorageAccountKey
 } = process.env;
 
 const secretClient = new SecretClient(`https://${AzureVaultName}.vault.azure.net`, new DefaultAzureCredential());
@@ -40,7 +42,8 @@ app.http("contentfulEventsHandler", {
             context.log("Received Contentful Webhook data:", requestBody);
 
             if(DebugMode && +DebugMode === 1) {
-                const storageService = new BlobStorageService({accountName: AzureStorageAccountName, logger: context})
+                const sharedKeyCredential = new StorageSharedKeyCredential(AzureStorageAccountName, AzureStorageAccountKey);
+                const storageService = new BlobStorageService({accountName: AzureStorageAccountName, logger: context, credential: sharedKeyCredential})
                 const blobName = `contentful-webhooks-${new Date().toISOString()}`
                 const data = JSON.stringify({body: requestBody, headers: request.headers, query: request.query})
                 const [isUploaded, requestId] = await storageService.upload(AzureStorageContainerName, blobName, data)
