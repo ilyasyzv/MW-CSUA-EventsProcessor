@@ -74,9 +74,15 @@ app.http("contentfulEventsHandler", {
             const date = new Date(requestBody.sys.updatedAt).toISOString().slice(0, -1);
             const actions = request.headers.get('x-contentful-topic').split(".").pop();
             const userId = request.query.get('user');
-            const environment = requestBody.sys.environment.sys.id;
+            let environmentId = requestBody.sys.environment.sys.id;
+
+            const aliases = requestBody.sys.environment.sys.aliases || [];
+            if (aliases.length > 0) {
+                environmentId = aliases[0].sys.id;
+            }
 
             const space = await client.getSpace(contentfulSpaceId);
+            const environment = await space.getEnvironment(environmentId);
 
             async function getUserEmail() {
                 try {
@@ -97,7 +103,7 @@ app.http("contentfulEventsHandler", {
                     date: date,
                     actions: actions,
                     user: userEmail,
-                    environment: environment,
+                    environment: environment.name,
                 }
 
                 await bigquery
